@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <header>
+        <a href="./index.html">Home</a>
+    </header>
+    <hr>
+    <form id="loanform">
+        <label for="c_id">Enter Customer_id : </label>
+        <input type="number" id="c_id" name="Customer_id" required/><br />
+        <label for="p">Enter Loan_amount(p) :</label>
+        <input type="number" id="p" name="Loan_amount" required/><br />
+        <label for="N">Enter Loan_period(N) :</label>
+        <input type="number" id="N" name="Loan_period"  required/><br />
+        <label for="ri">Enter Rate of Interest(I) :</label>
+        <input type="number" id="ri" name="Interest" required />
+        <button id="grant" type="submit">Grant</button>
+    </form>
+    <span>
+        Total Amount to be paid: Rs <span id="tmt">0</span> and the monthly EMI to be paid Rs <span id="Emi">0</span>Per
+        Month
+    </span>
+    < <script>
+        document.getElementById('loanform').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const c_id =  Number(document.getElementById("c_id").value);
+        const pnum = Number(document.getElementById("p").value);
+        const ny = Number(document.getElementById("N").value);
+        const ri = Number(document.getElementById("ri").value);
+        const t_amount = document.getElementById('tmt');
+        const emi = document.getElementById('Emi');
+
+        const interest = (pnum * ny * ri) / 100;
+        const totalAmount = pnum + interest;
+        const emiValue = totalAmount / (ny * 12);
+
+        t_amount.innerText = totalAmount.toFixed(2);
+        emi.innerText = emiValue.toFixed(2);
+
+        const formData = {
+        Customer_id: c_id,
+        Loan_amount: pnum,
+        Loan_period: ny,
+        Interest: ri,
+        total_amount: totalAmount,
+        EMI: emiValue
+        };
+
+
+        try {
+        const response = await fetch("http://localhost:3000/Lend", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log(result);
+        } catch (err) {
+        console.error('Error:', err);
+        }
+        });
+        </script>
+
+</html>

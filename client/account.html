@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Details</title>
+</head>
+<body>
+    <header>
+        <a href="./index.html">Home</a>
+    </header>
+    <hr>
+    <form id="accountForm">
+        <label for="customerId">Enter the Customer ID:</label>
+        <input type="text" id="customerId" name="customerId" /><br/>
+        <button type="submit">Search</button>
+    </form>
+    <div id="accountDetails">
+        <p>Loan amount: <span id="loanAmount"></span></p>
+        <p>Total amount: <span id="totalAmount"></span></p>
+        <p>EMI amount: <span id="emiAmount"></span></p>
+        <p>Total Interest: <span id="totalInterest"></span></p>
+        <p>The Amount paid till date: <span id="amountPaid"></span></p>
+        <p>No of EMI Left: <span id="numEMILeft"></span></p>
+    </div>
+
+    <script>
+        document.getElementById('accountForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const customerId = document.getElementById('customerId').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/Account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ customerId })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const accountData = await response.json();
+                console.log('Account details:', accountData);
+
+                document.getElementById('loanAmount').innerText = accountData.loan_amount;
+                document.getElementById('totalAmount').innerText = accountData.total_amount;
+                document.getElementById('emiAmount').innerText = accountData.monthly_emi;
+                document.getElementById('totalInterest').innerText = accountData.rate_of_interest;
+                document.getElementById('amountPaid').innerText = accountData.amountPaid;
+                document.getElementById('numEMILeft').innerText = (accountData.total_amount-accountData.amountPaid)/accountData.monthly_emi;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch account details. Please try again later.');
+            }
+        });
+    </script>
+</body>
+</html>

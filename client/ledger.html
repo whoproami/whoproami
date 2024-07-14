@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledger</title>
+</head>
+<body>
+    <header>
+        <a href="./index.html">Home</a>
+    </header>
+    <hr>
+    <h1>Ledger</h1>
+    <form id="ledgerForm">
+        <label for="customer_id">Enter the Customer ID:</label>
+        <input type="text" id="customer_id" name="customer_id" placeholder="ABCXYZ"/><br/>
+        <button type="submit">Find</button>
+    </form>
+    <div id="ledgerResult">
+        <!-- Transactions will be dynamically added here -->
+    </div>
+
+    <script>
+        document.getElementById('ledgerForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const customer_id = document.getElementById('customer_id').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/Ledger', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ customer_id })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const transactions = await response.json();
+                console.log('Ledger transactions:', transactions);
+
+                // Update DOM with transactions
+                const ledgerResult = document.getElementById('ledgerResult');
+                ledgerResult.innerHTML = ''; // Clear previous results
+
+                transactions.forEach(transaction => {
+                    const transactionElement = document.createElement('div');
+                    transactionElement.innerHTML = `
+                        <p>Transaction ID: ${transaction.transaction_id}</p>
+                        <p>Date: ${transaction.transaction_date}</p>
+                        <p>Amount: Rs ${transaction.payment_amount}</p>
+                        <p>Type: ${transaction.payment_type}</p>
+                        <hr>
+                    `;
+                    ledgerResult.appendChild(transactionElement);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle error
+                alert('Failed to fetch ledger details. Please try again later.');
+            }
+        });
+    </script>
+</body>
+</html>

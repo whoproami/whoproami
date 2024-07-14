@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Amount Paid</title>
+</head>
+<body>
+    <header>
+        <a href="./index.html">Home</a>
+    </header>
+    <hr>
+    <h1>Loan Amount Paid</h1>
+    <form id="paymentForm">
+        <label for=""c_id>Enter the Customer_id</label>
+        <input id="Customer_id" type="number" name="Customer_id"/> <br/>
+        <label for="paymentType">Emi or Lum Sum</label>
+        <select id="paymentType" name="paymentType">
+            <option value="EMI">EMI</option>
+            <option value="LUM SUM">LUM SUM</option>
+        </select>
+        <input type="text" id="amountInput" name="amount" placeholder="Amount" /><br>
+        <button type="submit">Done</button>
+    </form>
+
+    <script>
+        document.getElementById('paymentForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const paymentType = document.getElementById('paymentType').value;
+            const amount = document.getElementById('amountInput').value;
+            const Customer_id = document.getElementById('Customer_id').value;
+
+            const formData = {
+                paymentType: paymentType,
+                amount: amount,
+                Customer_id:Customer_id
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                console.log('Payment result:', result);
+                alert('Payment successfully processed!');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Payment failed. Please try again later.');
+            }
+        });
+    </script>
+</body>
+</html>
